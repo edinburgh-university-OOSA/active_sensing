@@ -180,6 +180,8 @@ class gediData(object):
       plt.plot(self.gWave[i]*2000+94,z,label='Ground')
       plt.legend()
       plt.xlim(left=0)
+      plt.xlabel('DN')
+      plt.ylabel('Elevation (m)')
       outNamen=outRoot+"."+str(self.waveID[i])+".x."+str(self.lon[i])+".y."+str(self.lat[i])+".png"
       plt.savefig(outNamen)
       plt.close()
