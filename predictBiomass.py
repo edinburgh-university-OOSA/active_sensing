@@ -28,23 +28,27 @@ class gediMetrics(object):
     '''Predict biomass using a hard wired model'''
     # filter usable data
     useInd=np.where((self.RH60>-100)&(self.RH60<1000)&(self.RH95>-100)&(self.RH95<1000))
+    # add offsets
+    offset=20.0
 
     if(len(useInd)>0):
       useInd=useInd[0]
+      # transform
+      RH60=self.RH60+offset
+      RH95=self.RH95+offset
       # parametric values
-      rh69rh90=np.log(self.rh60[useInd]*self.rh95[useInd])
-      # log transform
-      rh60=np.log(self.RH60)
-      rh95=np.log(self.RH95)
-      biomass=np.exp(-19.12512+rh60*0.73074+rh95*0.47493-0.00787*rh60rh90)
+      RH60RH95=(self.RH60[useInd]+offset)*(self.RH95[useInd]+offset)
+      # predict
+      biomass=RH60*0.73074+RH95*0.47493-0.00787*RH60RH95-19.12512
 
       # write to output
-      f=open(outNamen,'w')
+      f=open(outName,'w')
       j=0
       for i in useInd:
         line=str(self.lon[i])+" "+str(self.lat[i])+" "+str(biomass[j])+"\n"
         f.write(line)
         j=j+1
+
       f.close()
       print("Written to",outName)
 
