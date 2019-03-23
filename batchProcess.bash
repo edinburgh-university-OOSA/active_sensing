@@ -113,7 +113,7 @@ fi
 while read inName; do
   root=`echo $inName|gawk -F/ '{print $NF}'`
   output="$outRoot.$root"
-  gediMetric -input $inName -readHDFgedi $bounds -ground $varScale $statsLen $noiseTrack $sWidth $psWidth $msWidth $gWidth $minGsig $minWidth -outRoot $output -varNoise
+  gediMetric -input $inName -readHDFgedi $bounds -ground $varScale $statsLen $noiseTrack $sWidth $psWidth $msWidth $gWidth $minGsig $minWidth -outRoot $output -varNoise -rhRes 5
 done  < $list
 
 if [ -e $list ];then

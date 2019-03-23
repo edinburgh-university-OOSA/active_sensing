@@ -55,7 +55,7 @@ fi
 temp="/tmp/workSpace.biomass.$$.txt"
 while read inName; do
 
-  python3 $bin/predictBiomass.py --input $inName --outpout $temp
+  python3 $bin/predictBiomass.py --input $inName --output $temp
   cat $temp >> $output
 
   if [ -e $temp ];then
@@ -66,4 +66,5 @@ done  < $list
 if [ -e $list ];then
   rm $list
 fi
+echo "Written to $output"
 
