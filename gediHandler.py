@@ -173,12 +173,13 @@ class gediData(object):
     # loop over waves
     for i in useInd:
       # make z profile
-      res=(self.Z0[i]-self.ZN[i])/self.nBins
-      z=np.arange(self.Z0[i],self.ZN[i],-1*res)
+      self.res=(self.Z0[i]-self.ZN[i])/self.nBins
+      z=np.arange(self.Z0[i],self.ZN[i],-1*self.res)
+      # determine noise for scaling ground return
+      reflScale,meanN=self.meanNoise(i)
       # plot it
       plt.plot(self.wave[i],z,label='Waveform')
-      #plt.plot(self.gWave[i],z,label='Ground')
-      plt.plot(self.gWave[i]*2000+94,z,label='Ground')
+      plt.plot(self.gWave[i]*reflScale+meanN,z,label='Ground')
       plt.legend()
       plt.xlim(left=0)
       plt.xlabel('DN')
@@ -189,7 +190,17 @@ class gediData(object):
       plt.clf()
       print("Written to",outNamen)
 
+
+  ###########################################
+
+  def meanNoise(self,i):
+    statsLen=15
+    noiseBins=int(statsLen/self.res)
+    meanN=np.mean(self.wave[i][0:noiseBins])
+    totE=np.sum(self.wave[i]-meanN)*self.res
+    return(totE,meanN)
  
+
   ###########################################
 
   def writeCoords(self):
