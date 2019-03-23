@@ -19,7 +19,7 @@ class gediMetrics(object):
 
   def __init__(self,filename):
     '''Read the file'''
-    self.tG,self.eG=np.loadtxt=np.loadtxt(simMet,usecols=(1,5),unpack=True, dtype=float,comments='#')
+    self.tG,self.eG=np.loadtxt=np.loadtxt(filename,usecols=(1,5),unpack=True, dtype=float,comments='#')
 
 
   ###########################################
@@ -27,7 +27,7 @@ class gediMetrics(object):
   def groundErrHist(self,outName,nBins=10):
     '''make an error histogram'''
     # filter out missing data
-    useInd=np.where((self.tG>-100)&(self.eG>-100)&(selfteG<10000)&(self.eG<10000))
+    useInd=np.where((self.tG>-100)&(self.eG>-100)&(self.eG<10000)&(self.eG<10000))
     if(len(useInd)>0):
       useInd=useInd[0]
       # calculate differences
@@ -36,7 +36,7 @@ class gediMetrics(object):
       hist=np.histogram(err,bins=nBins)
       x=np.empty(len(hist[0]),dtype=float)
       for i in range(1,len(hist[1])):
-        x[i-1]=(hist[i]+hist[i-1])/2.0
+        x[i-1]=(hist[1][i]+hist[1][i-1])/2.0
       # plot it
       plt.plot(x,hist[0])
       plt.xlabel('Ground elevation error (m)')
@@ -45,7 +45,7 @@ class gediMetrics(object):
       plt.savefig(outName)
       plt.close()
       plt.clf()
-      print("Written to",outNamen)
+      print("Written to",outName)
     else:
       printf("No usable data in file")
 
@@ -77,7 +77,7 @@ if __name__ == '__main__':
   cmdargs=gediCommands()
   inName=cmdargs.inName
   output=cmdargs.output
-  output=nBins.nBins
+  nBins=cmdargs.nBins
 
   # read data
   data=gediMetrics(inName)

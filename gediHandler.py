@@ -177,6 +177,7 @@ class gediData(object):
       z=np.arange(self.Z0[i],self.ZN[i],-1*res)
       # plot it
       plt.plot(self.wave[i],z,label='Waveform')
+      #plt.plot(self.gWave[i],z,label='Ground')
       plt.plot(self.gWave[i]*2000+94,z,label='Ground')
       plt.legend()
       plt.xlim(left=0)
