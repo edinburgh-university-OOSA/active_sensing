@@ -37,12 +37,12 @@ class gediBiomass(object):
     # write header
     f=open(outName,'w')
     noData=-9999
-    header="NCOLS"+str(nX)+"\n"
-    header=header+"NROWS"+str(nY)+"\n"
-    header=header+"XLLCENTER"+str(minX)+"\n"
-    header=header+"YLLCENTER"+str(minY)+"\n"
-    header=header+"CELLSIZE"+str(res)+"\n"
-    header=header+"NODATA_VALUE"+str(noData)+"\n"
+    header="NCOLS "+str(nX)+"\n"
+    header=header+"NROWS "+str(nY)+"\n"
+    header=header+"XLLCENTER "+str(minX)+"\n"
+    header=header+"YLLCENTER "+str(minY)+"\n"
+    header=header+"CELLSIZE "+str(res)+"\n"
+    header=header+"NODATA_VALUE "+str(noData)+"\n"
     f.write(header)
     # remove nan
     meanAGBD[np.isnan(meanAGBD)]=noData

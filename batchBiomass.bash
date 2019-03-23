@@ -8,8 +8,8 @@
 
 
 # defaults
-output="allBiomass.txt"
 bin="/geos/netdata/avtrain/data/3d/active_sensing/week10/active_sensing"
+output="allBiomass.txt"
 
 # Read the command line
 while [[ $# -gt 0 ]]
