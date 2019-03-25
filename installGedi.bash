@@ -11,7 +11,7 @@
 export ARCH=`uname -m`
 export PATH=$PATH:./:$HOME/bin/$ARCH:$HOME/bin/csh
 export GEDIRAT_ROOT=$HOME/src/gedisimulator
-export CMPFIT_ROOT=$HOME/src/minpack/cmpfit-1.2
+export CMPFIT_ROOT=$HOME/src/cmpfit-1.2
 export GSL_ROOT=/usr/local/lib
 export LIBCLIDAR_ROOT=$HOME/src/libclidar
 export HANCOCKTOOLS_ROOT=$HOME/src/tools
@@ -21,7 +21,7 @@ envFile="$HOME/.bashrc"
 echo "export ARCH=`uname -m`" >> $envFile
 echo "export PATH=$PATH:./:$HOME/bin/$ARCH:$HOME/bin/csh" >> $envFile
 echo "export GEDIRAT_ROOT=$HOME/src/gedisimulator" >> $envFile
-echo "export CMPFIT_ROOT=$HOME/src/minpack/cmpfit-1.2" >> $envFile
+echo "export CMPFIT_ROOT=$HOME/src/cmpfit-1.2" >> $envFile
 echo "export GSL_ROOT=/usr/local/lib" >> $envFile
 echo "export LIBCLIDAR_ROOT=$HOME/src/libclidar" >> $envFile
 echo "export HANCOCKTOOLS_ROOT=$HOME/src/tools" >> $envFile
@@ -41,11 +41,8 @@ fi
 if [ ! -e $HOME/bin/csh ];then
   mkdir $HOME/bin/csh
 fi
-if [ ! -e $CMPFIT_ROOT ]; then
-  mkdir $CMPFIT_ROOT
-fi
 
-pushd $CMPFIT_ROOT
+pushd $HOME/src
 wget https://www.physics.wisc.edu/~craigm/idl/down/cmpfit-1.2.tar.gz
 tar -xvf cmpfit-1.2.tar.gz
 popd
