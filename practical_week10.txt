@@ -10,7 +10,7 @@ These can be copied and pasted in to the terminal to run the commands (word refo
 Install programs:
 The command for the simple install is:
 
->> /geos/netdata/avtrain/data/3d/active_sensing/week10/active_sensing/installGedi.bash
+>> /geos/netdata/active_sensing/week10/active_sensing/installGedi.bash
 >> source ~/.bashrc
 
 To test the software has successfully compiled, type:
@@ -22,14 +22,14 @@ To test the software has successfully compiled, type:
 Viewing data
 A script to plot the waveforms in the HDF5 file is available in:
 
-/geos/netdata/avtrain/data/3d/active_sensing/week10/active_sensing/gediHandler.py
+/geos/netdata/active_sensing/week10/active_sensing/gediHandler.py
 
 Do not worry about the contents of the script. It can be run from the command line without needing to modify the code (though you may modify if you want to).
 
 Set up a shortcut to that directory:
 
->> bin="/geos/netdata/avtrain/data/3d/active_sensing/week10/active_sensing"
->> dataDir="/geos/netdata/avtrain/data/3d/active_sensing/week10/gedi_sonoma_area"
+>> bin="/geos/netdata/active_sensing/week10/active_sensing"
+>> dataDir="/geos/netdata/active_sensing/week10/gedi_sonoma_area"
 
 
 The options can be seen by typing:
@@ -57,7 +57,7 @@ Start by viewing a small area, between:
 
 Note that not every file will pass through this area. Those files have been subset to:
 
-/geos/netdata/avtrain/data/3d/active_sensing/week10/gedi_sonoma_area
+/geos/netdata/active_sensing/week10/gedi_sonoma_area
 
 
 The script can also output a list of all coordinates in the file.

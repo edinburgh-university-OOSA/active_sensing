@@ -10,7 +10,7 @@
 # defaults
 bounds=" "
 readDir=1
-inDir="/geos/netdata/avtrain/data/3d/active_sensing/week10/gedi_sonoma"
+inDir="/geos/netdata/active_sensing/week10/gedi_sonoma"
 outRoot="test"
 
 # Read the command line

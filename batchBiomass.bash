@@ -8,7 +8,7 @@
 
 
 # defaults
-bin="/geos/netdata/avtrain/data/3d/active_sensing/week10/active_sensing"
+bin="pwd"
 output="allBiomass.txt"
 
 # Read the command line
