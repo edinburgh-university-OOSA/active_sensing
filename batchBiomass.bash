@@ -8,7 +8,7 @@
 
 
 # defaults
-bin="pwd"
+bin="/geos/netdata/active_sensing/week10/active_sensing"
 output="allBiomass.txt"
 
 # Read the command line
