@@ -7,49 +7,53 @@
 # set up environemnt #
 ######################
 
+
+HOMDIR="/home/shancoc2/data/teast/nerc_cdt" #$HOME
+
+
 # set up environment variables
 export ARCH=`uname -m`
-export PATH=$PATH:./:$HOME/bin/$ARCH:$HOME/bin/csh
-export GEDIRAT_ROOT=$HOME/src/gedisimulator
-export CMPFIT_ROOT=$HOME/src/cmpfit-1.2
+export PATH=$PATH:./:$HOMDIR/bin/$ARCH:$HOMDIR/bin/csh
+export GEDIRAT_ROOT=$HOMDIR/src/gedisimulator
+export CMPFIT_ROOT=$HOMDIR/src/cmpfit-1.2
 export GSL_ROOT=/usr/local/lib
-export LIBCLIDAR_ROOT=$HOME/src/libclidar
-export HANCOCKTOOLS_ROOT=$HOME/src/tools
+export LIBCLIDAR_ROOT=$HOMDIR/src/libclidar
+export HANCOCKTOOLS_ROOT=$HOMDIR/src/tools
 export HDF5_LIB=/apps/hdf5/1.8.15/patch1
 
-envFile="$HOME/.bashrc"
+envFile="$HOMDIR/.bashrc"
 echo "export ARCH=`uname -m`" >> $envFile
-echo "export PATH=$PATH:./:$HOME/bin/$ARCH:$HOME/bin/csh" >> $envFile
-echo "export GEDIRAT_ROOT=$HOME/src/gedisimulator" >> $envFile
-echo "export CMPFIT_ROOT=$HOME/src/cmpfit-1.2" >> $envFile
+echo "export PATH=$PATH:./:$HOMDIR/bin/$ARCH:$HOMDIR/bin/csh" >> $envFile
+echo "export GEDIRAT_ROOT=$HOMDIR/src/gedisimulator" >> $envFile
+echo "export CMPFIT_ROOT=$HOMDIR/src/cmpfit-1.2" >> $envFile
 echo "export GSL_ROOT=/usr/local/lib" >> $envFile
-echo "export LIBCLIDAR_ROOT=$HOME/src/libclidar" >> $envFile
-echo "export HANCOCKTOOLS_ROOT=$HOME/src/tools" >> $envFile
+echo "export LIBCLIDAR_ROOT=$HOMDIR/src/libclidar" >> $envFile
+echo "export HANCOCKTOOLS_ROOT=$HOMDIR/src/tools" >> $envFile
 echo "export HDF5_LIB=/apps/hdf5/1.8.15/patch1" >> $envFile
 
 
 # set up directory structure
-if [ ! -e $HOME/src ];then
-  mkdir $HOME/src
+if [ ! -e $HOMDIR/src ];then
+  mkdir $HOMDIR/src
 fi
-if [ ! -e $HOME/bin ];then
-  mkdir $HOME/bin
+if [ ! -e $HOMDIR/bin ];then
+  mkdir $HOMDIR/bin
 fi
-if [ ! -e $HOME/bin/$ARCH ];then
-  mkdir $HOME/bin/$ARCH
+if [ ! -e $HOMDIR/bin/$ARCH ];then
+  mkdir $HOMDIR/bin/$ARCH
 fi
-if [ ! -e $HOME/bin/csh ];then
-  mkdir $HOME/bin/csh
+if [ ! -e $HOMDIR/bin/csh ];then
+  mkdir $HOMDIR/bin/csh
 fi
 
-pushd $HOME/src
+pushd $HOMDIR/src
 wget https://www.physics.wisc.edu/~craigm/idl/down/cmpfit-1.2.tar.gz
 tar -xvf cmpfit-1.2.tar.gz
 popd
 
-pushd $HOME/src
-hg clone https://bitbucket.org/StevenHancock/libclidar
-hg clone https://bitbucket.org/StevenHancock/tools
+pushd $HOMDIR/src
+git clone https://bitbucket.org/StevenHancock/libclidar
+git clone https://bitbucket.org/StevenHancock/tools
 git clone https://bitbucket.org/StevenHancock/gedisimulator
 
 
@@ -62,8 +66,8 @@ for program in $programList;do
   make THIS=$program install
 done
 
-#cp *.csh $HOME/src/csh/
-#cp *.bash $HOME/src/csh/
+#cp *.csh $HOMDIR/src/csh/
+#cp *.bash $HOMDIR/src/csh/
 
 popd
 
