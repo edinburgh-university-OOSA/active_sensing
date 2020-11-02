@@ -8,7 +8,7 @@
 ######################
 
 
-HOMDIR="/home/shancoc2/data/teast/nerc_cdt" #$HOME
+HOMDIR="$HOME"
 
 
 # set up environment variables
