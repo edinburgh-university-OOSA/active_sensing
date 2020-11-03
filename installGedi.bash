@@ -57,7 +57,7 @@ git clone https://bitbucket.org/StevenHancock/tools
 git clone https://bitbucket.org/StevenHancock/gedisimulator
 
 
-programList="gediRat gediMetric mapLidar lvisBullseye"
+programList="gediRat gediMetric mapLidar collocateWaves lasPoints"
 cd $GEDIRAT_ROOT/
 make clean
 
