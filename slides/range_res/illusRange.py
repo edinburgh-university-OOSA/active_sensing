@@ -1,7 +1,7 @@
 
 
 '''
-Make illustrations of range resolution
+Make illustrations of pulse length limit to range resolution
 '''
 
 
