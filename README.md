@@ -13,3 +13,9 @@ A jupyter notebook to demonstrate phase.
 Some code to handle GEDI data.
 
 
+
+
+## Code to generate slides
+
+This folder contains code to generate graphs for use in the lecture slides.
+
