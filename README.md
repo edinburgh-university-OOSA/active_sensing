@@ -8,6 +8,11 @@ This repository contains the code for two active remote sensing practicals.
 A jupyter notebook to demonstrate phase.
 
 
+## Signal processing
+
+A jupyter notebook to demonstrate signal processing and in particular chirping.
+
+
 ## GEDI practical
 
 Some code to handle GEDI data.
