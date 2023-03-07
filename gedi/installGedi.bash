@@ -68,7 +68,7 @@ done
 
 programList="gediRatList.csh listGediWaves.csh overlapLasFiles.csh filtForR.csh"
 for program in $cshList;do
-  cp $program $HOME/bin/csh/
+  cp $program $HOMDIR/bin/csh/
 done
 
 #cp *.csh $HOMDIR/src/csh/
