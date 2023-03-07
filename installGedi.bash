@@ -66,6 +66,11 @@ for program in $programList;do
   make THIS=$program install
 done
 
+programList="gediRatList.csh listGediWaves.csh overlapLasFiles.csh filtForR.csh"
+for program in $cshList;do
+  cp $program $HOME/bin/csh/
+done
+
 #cp *.csh $HOMDIR/src/csh/
 #cp *.bash $HOMDIR/src/csh/
 
