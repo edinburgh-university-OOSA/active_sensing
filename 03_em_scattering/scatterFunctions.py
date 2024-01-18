@@ -28,8 +28,9 @@ class scatterDemo():
   ############################
 
   def __init__(self):
-    # do nothing
+    # do nothing on initialisation
     return
+
 
   ###########################
 
@@ -61,6 +62,25 @@ class scatterDemo():
     plt.ylabel("Height (m)")
     plt.plot(self.x,self.y)
     plt.show()
+    return
+
+
+  ###########################
+
+  def traceEnergy(self,zen=0.0,wavel=0.06):
+    '''Trace energy and determine BRDF'''
+
+
+    # for every segment of the scene, trace to the sun and work out the reflected energy
+
+
+    return
+
+
+  ###########################
+
+  def plotEnergy(self):
+    '''Plot the returned energy'''
     return
 
 
