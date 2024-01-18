@@ -15,6 +15,8 @@ svenhancock@gmail.com
 
 import numpy as np
 import matplotlib.pyplot as plt
+from math import sqrt
+from scipy.ndimage import gaussian_filter
 
 
 #################################################
@@ -31,7 +33,7 @@ class scatterDemo():
 
   ###########################
 
-  def makeSurface(self,rough=0.1,length=20.0,res=0.01):
+  def makeSurface(self,rough=0.1,fineRough=0.001,length=20.0,res=0.01,correl=1.0):
     '''Make a surface'''
 
     # make sure that the roughness is well sampled
@@ -40,14 +42,16 @@ class scatterDemo():
 
     # save variables
     self.length=length
-    self.rough=rough
     self.res=res
+    self.correl=correl
 
     # allocate array
     self.nBins=int(self.length/self.res)
     self.x=np.linspace(0,self.length,num=self.nBins)
-    self.y=np.random.normal(loc=0.0,scale=self.rough,size=self.nBins) # make the random heights
+    y=np.random.normal(loc=0.0,scale=sqrt(rough**2+self.correl**2),size=self.nBins) # make the random heights
+    self.y=gaussian_filter(y,correl/res)+np.random.normal(loc=0.0,scale=fineRough,size=self.nBins) # add correlation and final roughness
     return
+
 
   ###########################
 
