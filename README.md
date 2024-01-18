@@ -3,17 +3,22 @@
 This repository contains the code for two active remote sensing practicals.
 
 
-## Radar pahse
+## Week 1: Radar pahse
 
 A jupyter notebook to demonstrate phase.
 
 
-## Signal processing
+## Week 2: Signal processing
 
 A jupyter notebook to demonstrate signal processing and in particular chirping.
 
 
-## GEDI practical
+## Week 3: Scattering
+
+Script to demonstrate the scattering of radiation from different surfaces.
+
+
+## Week 7: GEDI practical
 
 Some code to handle GEDI data.
 
