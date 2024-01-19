@@ -38,7 +38,7 @@ class scatterDemo():
     '''Make a surface'''
 
     # make sure that the roughness is well sampled
-    if(res>(rough/3.0)):
+    if(res<(rough/3.0)):
       res=rough/3.0
 
     # save variables
@@ -71,9 +71,13 @@ class scatterDemo():
   def interfereWaves(self,zen=0.0,wavel=0.06,angRes=2*pi/360):
     '''Produce BRDF through wave interference'''
 
+    # convert to radians
+    zen=zen*pi/180
+
     # set the illumination height vector
     dZ=-1.0*cos(zen)
     zStart=100.0  # some arbitrary start point
+    xStart=0.0
 
     # allocate the result arrays
     self.angRes=angRes
@@ -84,16 +88,15 @@ class scatterDemo():
     self.refZ0=np.min(self.y)
     self.refNx=int(self.length/self.refRes)
     self.refNy=int((self.length+self.refZ0)/self.refRes)
-    self.refImage=np.zeros((self.refNx,self.refNy),dtype=float)
-    self.refCont=np.zeros((self.refNx,self.refNy),dtype=int)
+    self.refImage=np.zeros((self.refNy,self.refNx),dtype=float)
 
     # array of image coordinates
-    x=np.empty((self.refNx,self.refNy),dtype=float)
-    y=np.empty((self.refNx,self.refNy),dtype=float)
+    x=np.empty((self.refNy,self.refNx),dtype=float)
+    y=np.empty((self.refNy,self.refNx),dtype=float)
     for i in range(0,self.refNx):
-      x[i,:]=np.full(self.refNy,i*self.refRes)
+      x[:,i]=np.full(self.refNy,i*self.refRes)
     for j in range(0,self.refNy):
-      y[:,j]=np.full(self.refNx,j*self.refRes)
+      y[j,:]=np.full(self.refNx,j*self.refRes)
 
 
     # for progress tracking
@@ -108,25 +111,24 @@ class scatterDemo():
       x0=self.x[k]
       y0=self.y[k]
       # determine start phase
-      startDist=(zStart-y0)/dZ
+      startDist=x0*sin(zen)
 
       # distance to every point
       dists=np.sqrt((x-x0)**2+(y-y0)**2)+startDist
       angles=2*pi*(dists/wavel)%(2*pi)
       amp=self.rho*np.sin(angles)
+      #plt.imshow(amp,interpolation='none')
+      #plt.show()
+    
 
       # set underground to zero
       for i in range(0,self.refNx):
         ind=int(i*self.refRes/self.res)
         yGr=self.y[ind]
-        amp[i,y[i]<yGr]=0.0
+        amp[y[:,i]<yGr,i]=0.0
 
       self.refImage+=amp
-      self.refCont+=1
 
-    # normalise image
-    self.refImage[self.refCont>0]/=self.refCont[self.refCont>0]
-    print("Ping")
     return
 
 
@@ -136,7 +138,7 @@ class scatterDemo():
     '''Trace energy and determine BRDF'''
 
     # set the illumination vector
-    vectRay=np.array((sin(zen),-1.0*cos(zen)))
+    vectRay=np.array((sin(zen*pi/180),-1.0*cos(zen*pi/180)))
 
     # for every segment of the scene, trace to the sun and work out the reflected energy
     for i in range(0,self.x.shape[0]-1):
@@ -157,9 +159,9 @@ class scatterDemo():
   def plotEnergy(self):
     '''Plot the returned energy'''
 
+    #plt.imshow(self.refImage,interpolation='none')
     plt.imshow(self.refImage)
     plt.show()
-
 
     return
 
