@@ -15,7 +15,7 @@ svenhancock@gmail.com
 
 import numpy as np
 import matplotlib.pyplot as plt
-from math import sqrt
+from math import sqrt,cos,sin,pi
 from scipy.ndimage import gaussian_filter
 
 
@@ -34,7 +34,7 @@ class scatterDemo():
 
   ###########################
 
-  def makeSurface(self,rough=0.1,fineRough=0.001,length=20.0,res=0.01,correl=1.0):
+  def makeSurface(self,rough=0.1,fineRough=0.001,length=20.0,res=0.01,correl=1.0,rho=0.5):
     '''Make a surface'''
 
     # make sure that the roughness is well sampled
@@ -67,11 +67,50 @@ class scatterDemo():
 
   ###########################
 
+  def interfereWaves(self,zen=0.0,wavel=0.06,angRes=2*pi/360):
+    '''Produce BRDF through wave interference'''
+
+    # set the illumination height vector
+    dZ=-1.0*cos(zen)
+    z0=100.0  # some arbitrary start point
+
+    # allocate the result arrays
+    self.angRes=angRes
+    self.nAng=int(2*pi/angRes)
+    self.angRefl=np.zeros((self.nAng),dtype=float)
+    self.angContN=np.zeros((self.nAng),dtype=int)
+    self.refRes=wavel/4.0
+    self.refNx=self.refNy=int(self.length/self.refRes)
+    self.refImage=np.zeros((self.refNx,self.refNy),dtype=float)
+    self.refCont=np.zeros((self.refNx,self.refNy),dtype=int)
+
+    # set out an emitted wave from every point on the object
+    for i in range(0,self.x.shape[0]):
+      # determine start phase
+      startPhase=(((z0-self.y[i])/dZ)/wavel)%(2*pi)
+
+
+
+
+
+
+  ###########################
+
   def traceEnergy(self,zen=0.0,wavel=0.06):
     '''Trace energy and determine BRDF'''
 
+    # set the illumination vector
+    vectRay=np.array((sin(zen),-1.0*cos(zen)))
 
     # for every segment of the scene, trace to the sun and work out the reflected energy
+    for i in range(0,self.x.shape[0]-1):
+      # find ground vector here
+      dX=self.x[i+1]-self.x[i]
+      dY=self.y[i+1]-self.y[i]
+      vectLen=sqrt(dX**2+dY**2)
+      vectGr=np.array((dX/vectLen,dY/vectLen))
+
+      # determine angle of reflection
 
 
     return
