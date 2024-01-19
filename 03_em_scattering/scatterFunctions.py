@@ -160,7 +160,7 @@ class scatterDemo():
     '''Plot the returned energy'''
 
     #plt.imshow(self.refImage,interpolation='none')
-    plt.imshow(self.refImage)
+    plt.imshow(self.refImage,interpolation='none')
     plt.show()
 
     return
