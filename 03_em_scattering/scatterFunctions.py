@@ -34,17 +34,18 @@ class scatterDemo():
 
   ###########################
 
-  def makeSurface(self,rough=0.1,fineRough=0.001,length=20.0,res=0.01,correl=1.0,rho=0.5):
+  def makeSurface(self,rough=0.2,fineRough=0.001,length=20.0,res=0.1,correl=1.0,rho=0.5):
     '''Make a surface'''
 
     # make sure that the roughness is well sampled
-    if(res>(rough/10.0)):
-      res=rough/10.0
+    if(res>(rough/3.0)):
+      res=rough/3.0
 
     # save variables
     self.length=length
     self.res=res
     self.correl=correl
+    self.rho=rho
 
     # allocate array
     self.nBins=int(self.length/self.res)
@@ -72,7 +73,7 @@ class scatterDemo():
 
     # set the illumination height vector
     dZ=-1.0*cos(zen)
-    z0=100.0  # some arbitrary start point
+    zStart=100.0  # some arbitrary start point
 
     # allocate the result arrays
     self.angRes=angRes
@@ -80,18 +81,53 @@ class scatterDemo():
     self.angRefl=np.zeros((self.nAng),dtype=float)
     self.angContN=np.zeros((self.nAng),dtype=int)
     self.refRes=wavel/4.0
-    self.refNx=self.refNy=int(self.length/self.refRes)
+    self.refZ0=np.min(self.y)
+    self.refNx=int(self.length/self.refRes)
+    self.refNy=int((self.length+self.refZ0)/self.refRes)
     self.refImage=np.zeros((self.refNx,self.refNy),dtype=float)
     self.refCont=np.zeros((self.refNx,self.refNy),dtype=int)
 
+    # array of image coordinates
+    x=np.empty((self.refNx,self.refNy),dtype=float)
+    y=np.empty((self.refNx,self.refNy),dtype=float)
+    for i in range(0,self.refNx):
+      x[i,:]=np.full(self.refNy,i*self.refRes)
+    for j in range(0,self.refNy):
+      y[:,j]=np.full(self.refNx,j*self.refRes)
+
+
+    # for progress tracking
+    nMess=10
+    spacing=int(self.x.shape[0]/nMess+1)
+
     # set out an emitted wave from every point on the object
-    for i in range(0,self.x.shape[0]):
+    for k in range(0,self.x.shape[0]):
+      if((k%spacing)==0):
+        print("Progress",100*k/self.x.shape[0],"%")
+
+      x0=self.x[k]
+      y0=self.y[k]
       # determine start phase
-      startPhase=(((z0-self.y[i])/dZ)/wavel)%(2*pi)
+      startDist=(zStart-y0)/dZ
 
+      # distance to every point
+      dists=np.sqrt((x-x0)**2+(y-y0)**2)+startDist
+      angles=2*pi*(dists/wavel)%(2*pi)
+      amp=self.rho*np.sin(angles)
 
+      # set underground to zero
+      for i in range(0,self.refNx):
+        ind=int(i*self.refRes/self.res)
+        yGr=self.y[ind]
+        amp[i,y[i]<yGr]=0.0
 
+      self.refImage+=amp
+      self.refCont+=1
 
+    # normalise image
+    self.refImage[self.refCont>0]/=self.refCont[self.refCont>0]
+    print("Ping")
+    return
 
 
   ###########################
@@ -120,6 +156,11 @@ class scatterDemo():
 
   def plotEnergy(self):
     '''Plot the returned energy'''
+
+    plt.imshow(self.refImage)
+    plt.show()
+
+
     return
 
 
