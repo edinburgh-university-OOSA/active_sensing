@@ -35,7 +35,7 @@ if __name__ == '__main__':
     p.add_argument("--real",dest="realName",type=str,help=("Input GEDI HDF5 filename"))
     p.add_argument("--sim", dest ="simName", type=str,help=("Input simulated GEDI HDF5 filename"))
     p.add_argument("--outRoot",dest="outRoot",type=str,default='test',help=("Output graph filename root"))
-    p.add_argument("--metric",dest="metName", type=str, default=" ", help=("Optional: Metric filename, for ground esoimates"))
+    p.add_argument("--metric",dest="metName", type=str, default=" ", help=("Optional: Metric filename, for ground estimates"))
     p.add_argument("--datumDiff",dest="datum", type=float, default=0.0, help=("Optional: Datum difference"))
     cmdargs = p.parse_args()
     return cmdargs
