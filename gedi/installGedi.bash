@@ -19,7 +19,7 @@ export CMPFIT_ROOT=$HOMDIR/src/cmpfit-1.2
 export GSL_ROOT=/usr/local/lib
 export LIBCLIDAR_ROOT=$HOMDIR/src/libclidar
 export HANCOCKTOOLS_ROOT=$HOMDIR/src/tools
-export HDF5_LIB=/apps/hdf5/1.8.15/patch1
+export HDF5_LIB=/usr/lib/x86_64-linux-gnu/hdf5/serial
 
 envFile="$HOMDIR/.bashrc"
 echo "export ARCH=`uname -m`" >> $envFile
@@ -29,7 +29,7 @@ echo "export CMPFIT_ROOT=$HOMDIR/src/cmpfit-1.2" >> $envFile
 echo "export GSL_ROOT=/usr/local/lib" >> $envFile
 echo "export LIBCLIDAR_ROOT=$HOMDIR/src/libclidar" >> $envFile
 echo "export HANCOCKTOOLS_ROOT=$HOMDIR/src/tools" >> $envFile
-echo "export HDF5_LIB=/apps/hdf5/1.8.15/patch1" >> $envFile
+echo "export HDF5_LIB=/usr/lib/x86_64-linux-gnu/hdf5/serial" >> $envFile
 
 
 # set up directory structure
