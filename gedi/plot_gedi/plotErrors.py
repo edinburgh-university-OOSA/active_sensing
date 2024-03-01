@@ -28,8 +28,9 @@ if __name__ == '__main__':
     '''
     p = argparse.ArgumentParser(description=("Writes out properties of GEDI waveform files"))
     p.add_argument("--real",dest="realName",type=str,help=("Input GEDI HDF5 filename"))
-    p.add_argument("--outRoot",dest="outRoot",type=str,default='test',help=("Output graph filename root"))
+    p.add_argument("--output",dest="outnamen",type=str,default='test.png',help=("Output graph filename"))
     p.add_argument("--als",dest="metName", type=str, default=" ", help=("Metric filename from ALS data"))
+    p.add_argument("--useSense",dest="xSense",default=False,action='store_true', help=("Plot sensitivity - cover on the x axis"))
     cmdargs = p.parse_args()
     return cmdargs
 
@@ -42,7 +43,7 @@ class gediMetrics():
     '''Initialiser'''
 
     self.waveID=np.genfromtxt(filename,usecols=(0,), unpack=True, dtype=str,comments='#')
-    self.ZG,self.sense=np.loadtxt(filename,usecols=(5,112), unpack=True, dtype=float,comments='#')
+    self.ZG,self.sense,self.cov=np.loadtxt(filename,usecols=(5,112,4), unpack=True, dtype=float,comments='#')
 
     self.shotN=np.empty(self.waveID.shape,dtype=int)
     self.beam=np.empty(self.waveID.shape,dtype=str)
@@ -63,6 +64,7 @@ class gediL2A():
 
     # open the file
     f=h5py.File(filename,'r')
+    self.nWaves=0
 
     # loop over beams
     beamList=['BEAM0000', 'BEAM0001', 'BEAM0010', 'BEAM0011', 'BEAM0101', 'BEAM0110', 'BEAM1000', 'BEAM1011']
@@ -72,16 +74,23 @@ class gediL2A():
       elif(('geolocation' in list(f[b]))==False):  # no data in bea,
         continue        
 
-      if(self.nWaves==0)
-        self.ZG=np.array(f[b]['elev_lowestmode'])
-        self.shotN=np.array(f[b]['shot_number'])
-        self.sensitivity=np.array(f[b]['sensitivity'])
-      else:
-        self.ZG=np.append(self.ZG,np.array(f[b]['elev_lowestmode']))
-        self.shotN=np.append(self.shotN,np.array(f[b]['shot_number']))
-        self.sensitivity=np.append(self.sensitivity,f[b]['sensitivity'])
+      ZG=np.array(f[b]['elev_lowestmode'])
+      shotN=np.array(f[b]['shot_number'])
+      sensitivity=np.array(f[b]['sensitivity'])
+      nWaves=ZG.shape[0]
 
-      self.nWaves=self.ZG.shape[0]
+      if(self.nWaves==0):
+        self.ZG=ZG
+        self.shotN=shotN
+        self.sensitivity=sensitivity
+        self.beam=np.repeat(b,nWaves)
+      else:
+        self.ZG=np.append(self.ZG,ZG)
+        self.shotN=np.append(self.shotN,shotN)
+        self.sensitivity=np.append(self.sensitivity,sensitivity)
+        self.beam=np.append(self.beam,np.repeat(b,nWaves))
+
+      self.nWaves+=nWaves
 
     f.close()
     return
@@ -90,7 +99,7 @@ class gediL2A():
 
 ###########################################
 
-def plotComparison(gedi,met,outRoot,datum=0,mode=0):
+def plotComparison(gedi,met,outnamen,xSense=False):
   '''Function to plot graph comparisons'''
 
   # create arrays
@@ -103,27 +112,43 @@ def plotComparison(gedi,met,outRoot,datum=0,mode=0):
   contN=0
   for i in range(0,gedi.nWaves):
     # find corresponding etric
-    shotN=gedi.waveID[i]
+    shotN=gedi.shotN[i]
     beam=gedi.beam[i]
 
-    metInd=np.where((met.shotN==shotN)&(met.beam==beam))
+    metInd=np.where((met.shotN==shotN)) #&(met.beam==beam))
+
     if(len(metInd)>0):
       metInd=metInd[0]
+      if(len(metInd)>0):
+        metInd=metInd[0]
+      else:
+        continue
     else:
       continue
 
-    if(mode==0):  # scatter plot of elevatiosn
-      x[contN]=met.ZG
-      y[contN]=gedi.ZG[i]
+    if(xSense):  # scatter plot of elevatiosn
+      x[contN]=gedi.sensitivity[i]-met.cov[metInd]
+      y[contN]=gedi.ZG[i]-met.ZG[metInd]
     else:         # error against sense-cover
+      x[contN]=met.ZG[metInd]
+      y[contN]=gedi.ZG[i]
 
     contN+=1
 
+  # plot the graph
+  plt.plot(x[0:contN],y[0:contN],'.')
+  if(xSense):
+    plt.xlabel('Beam sensitivity - canopy cover (%)')
+    plt.ylabel('GEDI L2A - ALS ground elevation (m)')
+  else:
+    plt.xlabel('ALS ground elevation (m)')
+    plt.ylabel('GEDI L2A ground elevation (m)')
 
-    if(met.useMet==1):
-      plt.plot([minY,maxY], [met.ZG[metInd],met.ZG[metInd]], color='b', linestyle='-', linewidth=2)
+  plt.savefig(outnamen)
+  print('Drawn to',outnamen)
 
   return
+
 
 ###########################################
 # the main block
@@ -139,5 +164,5 @@ if __name__ == '__main__':
   met=gediMetrics(cmd.metName)
 
   # plot them up
-  plotComparison(gedi,met,cmd.outRoot,datum=cmd.datum)
+  plotComparison(gedi,met,cmd.outnamen,xSense=cmd.xSense)
 
