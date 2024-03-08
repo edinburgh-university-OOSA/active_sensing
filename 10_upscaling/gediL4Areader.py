@@ -121,3 +121,64 @@ class gediL4A():
     plt.show()
     return
 
+
+###################################################
+
+class dataTable():
+  '''Class to intersect GEDI and PALSAR data'''
+
+  ####################################
+
+  def __init__(self,gedi,palsarHH,hh,palsarHV,hv):
+    '''Class initialiser'''
+
+
+    # intersect the GEDI and PALSAR data
+    # HH
+    i=(gedi.lon-palsarHH.bounds[0])//palsarHH.res[0]
+    j=(palsarHH.bounds[3]-gedi.lat)//palsarHH.res[0]
+
+    # filter data outside of image and save backscatter
+    iFilt=np.array(i[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)],dtype=int)
+    jFilt=np.array(j[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)],dtype=int)
+    self.hh=hh[jFilt,iFilt]
+
+    # save GEDI data
+    self.agbd=gedi.agbd[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)]
+    self.quality=gedi.quality[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)]
+    self.lat=gedi.lat[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)]
+    self.lon=gedi.lon[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)]
+    self.sensitivity=gedi.sensitivity[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)]
+
+    # HV
+    i=(gedi.lon-palsarHV.bounds[0])//palsarHV.res[0]
+    j=(palsarHV.bounds[3]-gedi.lat)//palsarHV.res[0]
+    
+    # filter data outside of image and save backscatter
+    iFilt=np.array(i[(i>=0)&(i<=palsarHV.width)&(j>=0)&(j<palsarHV.height)],dtype=int)
+    jFilt=np.array(j[(i>=0)&(i<=palsarHV.width)&(j>=0)&(j<palsarHV.height)],dtype=int)
+    self.hv=hv[jFilt,iFilt]
+    return
+
+  ####################################
+
+  def plotHH(self):
+    '''Plot the HH dataset'''
+
+    plt.plot(self.hh,self.agbd,'.')
+    plt.xlabel('PALSAR-2 HH bakscatter')
+    plt.ylabel('GEDI L4A AGBD (Mg/ha)')
+    plt.show()
+    return
+
+  ####################################
+
+  def plotHV(self):
+    '''Plot the HH dataset'''
+
+    plt.plot(self.hv,self.agbd,'.')
+    plt.xlabel('PALSAR-2 HV bakscatter')
+    plt.ylabel('GEDI L4A AGBD (Mg/ha)')
+    plt.show()
+    return
+
