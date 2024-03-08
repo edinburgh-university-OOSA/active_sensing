@@ -9,6 +9,11 @@ GEDI L4A files
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
 
 ######################################
 
@@ -141,7 +146,8 @@ class dataTable():
     # filter data outside of image and save backscatter
     iFilt=np.array(i[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)],dtype=int)
     jFilt=np.array(j[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)],dtype=int)
-    self.hh=hh[jFilt,iFilt]
+    self.sar=np.empty((2,jFilt.shape[0]),dtype=float)
+    self.sar[0,:]=hh[jFilt,iFilt]
 
     # save GEDI data
     self.agbd=gedi.agbd[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)]
@@ -157,7 +163,7 @@ class dataTable():
     # filter data outside of image and save backscatter
     iFilt=np.array(i[(i>=0)&(i<=palsarHV.width)&(j>=0)&(j<palsarHV.height)],dtype=int)
     jFilt=np.array(j[(i>=0)&(i<=palsarHV.width)&(j>=0)&(j<palsarHV.height)],dtype=int)
-    self.hv=hv[jFilt,iFilt]
+    self.sar[1,:]=hv[jFilt,iFilt]
     return
 
   ####################################
@@ -165,7 +171,7 @@ class dataTable():
   def plotHH(self):
     '''Plot the HH dataset'''
 
-    plt.plot(self.hh,self.agbd,'.')
+    plt.plot(self.sar[0,:],self.agbd,'.')
     plt.xlabel('PALSAR-2 HH bakscatter')
     plt.ylabel('GEDI L4A AGBD (Mg/ha)')
     plt.show()
@@ -176,9 +182,56 @@ class dataTable():
   def plotHV(self):
     '''Plot the HH dataset'''
 
-    plt.plot(self.hv,self.agbd,'.')
+    plt.plot(self.sar[1,:],self.agbd,'.')
     plt.xlabel('PALSAR-2 HV bakscatter')
     plt.ylabel('GEDI L4A AGBD (Mg/ha)')
     plt.show()
+    return
+
+  ####################################
+
+  def correlHH(self):
+    '''Return the linear correlation of HH to AGBD'''
+    correl=np.corrcoef(self.agbd,self.sar[0,:])[0][-1]
+    print('Correlation between AGBD and HH is',round(correl,3))
+    return
+
+  ####################################
+
+  def correlHV(self):
+    '''Return the linear correlation of HV to AGBD'''
+    correl=np.corrcoef(self.agbd,self.sar[1,:])[0][-1]
+    print('Correlation between AGBD and HV is',round(correl,3))
+    return
+
+  ##################
+
+  def splitData(self,trainFrac=0.7):
+    '''Split into training and validation data'''
+
+    self.x_train,self.x_test,self.y_train,self.y_test=train_test_split(self.sar,self.agbd,test_size=1-trainFrac,random_state=0)
+    return
+
+
+  ##################
+
+  def buildRF(self,n_estimators,max_depth):
+    '''Build a random forest model'''
+
+    # initlise the class
+    self.regressor=RandomForestRegressor(n_estimators=cmd.n_estimators,max_depth=cmd.max_depth,random_state=0)  # initialise the class
+
+    # fit the model to the training data
+    self.regressor.fit(self.x_train,self.y_train)
+
+    return
+
+  ##################
+
+  def predict(self):
+    '''Predict the model on all the data'''
+
+    self.y_pred=self.regressor.predict(self.sar)
+
     return
 
