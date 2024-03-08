@@ -13,6 +13,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+from math import sqrt
 
 
 ######################################
@@ -244,5 +245,27 @@ class dataTable():
     plt.xlabel('GEDI L4A AGBD (Mg/ha)')
     plt.ylabel('PALSAR-2 RF estimated AGBD (Mg/ha)')
     plt.show()
+    return
+
+  ##################
+
+  def validateRF(self):
+    '''Validate against the validation data'''
+
+    # predict the validation data
+    valid_pred=self.regressor.predict(self.x_test)
+
+    # error metrics
+    bias=np.mean(valid_pred-self.y_test)
+    correl=np.corrcoef(self.y_test,valid_pred)[0][-1]
+    rmse=sqrt(np.sum((valid_pred-self.y_test)**2)/valid_pred.shape[0])
+    meanAGBD=np.mean(self.y_test)
+
+    print('Bias',round(bias,3),'Mg/ha')
+    print('RMSE',round(rmse,2),'Mg/ha')
+    print('Correlation',round(correl,3))
+    print('For a mean AGBD of',round(meanAGBD,2),'Mg/ha')
+
+
     return
 
