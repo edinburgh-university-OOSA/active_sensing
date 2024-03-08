@@ -213,6 +213,24 @@ class dataTable():
     self.x_train,self.x_test,self.y_train,self.y_test=train_test_split(self.sar,self.agbd,test_size=1-trainFrac,random_state=0)
     return
 
+  ##################
+
+  def splitSpatially(self,trainFrac=0.7):
+    '''Split into training and validation data by latitude'''
+
+    # find percentile latitude
+    splitLat=np.percentile(self.lat,trainFrac*100)
+
+    # split the data
+    useInd=np.where(self.lat<=splitLat)[0]
+    self.x_train=self.sar[useInd,:]
+    self.y_train=self.agbd[useInd]
+
+    useInd=np.where(self.lat>splitLat)[0]
+    self.x_test=self.sar[useInd,:]
+    self.y_test=self.agbd[useInd]
+    return
+
 
   ##################
 
