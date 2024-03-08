@@ -284,6 +284,34 @@ class dataTable():
     print('Correlation',round(correl,3))
     print('For a mean AGBD of',round(meanAGBD,2),'Mg/ha')
 
+    return
+
+  ##################
+
+  def mapAll(self,hh,hv):
+    '''Print a map of biomass to the screen'''
+
+    # pack data
+    print('Packing')
+    nX=hh.shape[0]
+    nY=hh.shape[1]
+    data=np.empty((nX*nY,2),dtype=float)
+    data[:,0]=np.ndarray.flatten(hh)
+    data[:,1]=np.ndarray.flatten(hv)
+
+    # predict
+    print('Predicting')
+    biomass=self.regressor.predict(data)
+
+    # reshape back into image
+    print('reshaping')
+    biomassMap=np.reshape(biomass,hh.shape)
+
+    # plot it
+    print('Plotting')
+    plt.imshow(biomassMap)
+    plt.show()
+    print('Ping')
 
     return
 
