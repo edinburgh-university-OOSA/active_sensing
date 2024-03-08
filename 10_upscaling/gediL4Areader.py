@@ -146,8 +146,8 @@ class dataTable():
     # filter data outside of image and save backscatter
     iFilt=np.array(i[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)],dtype=int)
     jFilt=np.array(j[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)],dtype=int)
-    self.sar=np.empty((2,jFilt.shape[0]),dtype=float)
-    self.sar[0,:]=hh[jFilt,iFilt]
+    self.sar=np.empty((jFilt.shape[0],2),dtype=float)
+    self.sar[:,0]=hh[jFilt,iFilt]
 
     # save GEDI data
     self.agbd=gedi.agbd[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)]
@@ -163,7 +163,7 @@ class dataTable():
     # filter data outside of image and save backscatter
     iFilt=np.array(i[(i>=0)&(i<=palsarHV.width)&(j>=0)&(j<palsarHV.height)],dtype=int)
     jFilt=np.array(j[(i>=0)&(i<=palsarHV.width)&(j>=0)&(j<palsarHV.height)],dtype=int)
-    self.sar[1,:]=hv[jFilt,iFilt]
+    self.sar[:,1]=hv[jFilt,iFilt]
     return
 
   ####################################
@@ -171,7 +171,7 @@ class dataTable():
   def plotHH(self):
     '''Plot the HH dataset'''
 
-    plt.plot(self.sar[0,:],self.agbd,'.')
+    plt.plot(self.sar[:,0],self.agbd,'.')
     plt.xlabel('PALSAR-2 HH bakscatter')
     plt.ylabel('GEDI L4A AGBD (Mg/ha)')
     plt.show()
@@ -182,7 +182,7 @@ class dataTable():
   def plotHV(self):
     '''Plot the HH dataset'''
 
-    plt.plot(self.sar[1,:],self.agbd,'.')
+    plt.plot(self.sar[:,1],self.agbd,'.')
     plt.xlabel('PALSAR-2 HV bakscatter')
     plt.ylabel('GEDI L4A AGBD (Mg/ha)')
     plt.show()
@@ -192,7 +192,7 @@ class dataTable():
 
   def correlHH(self):
     '''Return the linear correlation of HH to AGBD'''
-    correl=np.corrcoef(self.agbd,self.sar[0,:])[0][-1]
+    correl=np.corrcoef(self.agbd,self.sar[:,0])[0][-1]
     print('Correlation between AGBD and HH is',round(correl,3))
     return
 
@@ -200,7 +200,7 @@ class dataTable():
 
   def correlHV(self):
     '''Return the linear correlation of HV to AGBD'''
-    correl=np.corrcoef(self.agbd,self.sar[1,:])[0][-1]
+    correl=np.corrcoef(self.agbd,self.sar[:,1])[0][-1]
     print('Correlation between AGBD and HV is',round(correl,3))
     return
 
@@ -219,7 +219,7 @@ class dataTable():
     '''Build a random forest model'''
 
     # initlise the class
-    self.regressor=RandomForestRegressor(n_estimators=cmd.n_estimators,max_depth=cmd.max_depth,random_state=0)  # initialise the class
+    self.regressor=RandomForestRegressor(n_estimators=n_estimators,max_depth=max_depth,random_state=0)  # initialise the class
 
     # fit the model to the training data
     self.regressor.fit(self.x_train,self.y_train)
@@ -233,5 +233,16 @@ class dataTable():
 
     self.y_pred=self.regressor.predict(self.sar)
 
+    return
+
+  ##################
+
+  def scatterAll(self):
+    '''Make a scatterplot of predicted and observed'''
+
+    plt.plot(self.agbd,self.y_pred,'.')
+    plt.xlabel('GEDI L4A AGBD (Mg/ha)')
+    plt.ylabel('PALSAR-2 RF estimated AGBD (Mg/ha)')
+    plt.show()
     return
 
