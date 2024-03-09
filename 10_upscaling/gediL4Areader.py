@@ -14,6 +14,7 @@ from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from math import sqrt
+import rasterio
 
 
 ######################################
@@ -135,36 +136,41 @@ class dataTable():
 
   ####################################
 
-  def __init__(self,gedi,palsarHH,hh,palsarHV,hv):
+  def __init__(self,gedi,palsarHH,palsarHV):
     '''Class initialiser'''
 
 
     # intersect the GEDI and PALSAR data
     # HH
-    i=(gedi.lon-palsarHH.bounds[0])//palsarHH.res[0]
-    j=(palsarHH.bounds[3]-gedi.lat)//palsarHH.res[0]
+    i=(gedi.lon-palsarHH.file.bounds[0])//palsarHH.file.res[0]
+    j=(palsarHH.file.bounds[3]-gedi.lat)//palsarHH.file.res[0]
 
     # filter data outside of image and save backscatter
-    iFilt=np.array(i[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)],dtype=int)
-    jFilt=np.array(j[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)],dtype=int)
+    iFilt=np.array(i[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)],dtype=int)
+    jFilt=np.array(j[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)],dtype=int)
     self.sar=np.empty((jFilt.shape[0],2),dtype=float)
-    self.sar[:,0]=hh[jFilt,iFilt]
+    self.sar[:,0]=palsarHH.data[jFilt,iFilt]
 
     # save GEDI data
-    self.agbd=gedi.agbd[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)]
-    self.quality=gedi.quality[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)]
-    self.lat=gedi.lat[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)]
-    self.lon=gedi.lon[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)]
-    self.sensitivity=gedi.sensitivity[(i>=0)&(i<=palsarHH.width)&(j>=0)&(j<palsarHH.height)]
+    self.agbd=gedi.agbd[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)]
+    self.quality=gedi.quality[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)]
+    self.lat=gedi.lat[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)]
+    self.lon=gedi.lon[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)]
+    self.sensitivity=gedi.sensitivity[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)]
 
     # HV
-    i=(gedi.lon-palsarHV.bounds[0])//palsarHV.res[0]
-    j=(palsarHV.bounds[3]-gedi.lat)//palsarHV.res[0]
+    i=(gedi.lon-palsarHV.file.bounds[0])//palsarHV.file.res[0]
+    j=(palsarHV.file.bounds[3]-gedi.lat)//palsarHV.file.res[0]
     
     # filter data outside of image and save backscatter
-    iFilt=np.array(i[(i>=0)&(i<=palsarHV.width)&(j>=0)&(j<palsarHV.height)],dtype=int)
-    jFilt=np.array(j[(i>=0)&(i<=palsarHV.width)&(j>=0)&(j<palsarHV.height)],dtype=int)
-    self.sar[:,1]=hv[jFilt,iFilt]
+    iFilt=np.array(i[(i>=0)&(i<=palsarHV.file.width)&(j>=0)&(j<palsarHV.file.height)],dtype=int)
+    jFilt=np.array(j[(i>=0)&(i<=palsarHV.file.width)&(j>=0)&(j<palsarHV.file.height)],dtype=int)
+    self.sar[:,1]=palsarHV.data[jFilt,iFilt]
+
+    # save all palsar data for later
+    self.palsarHH=palsarHH
+    self.palsarHV=palsarHV
+
     return
 
   ####################################
@@ -288,16 +294,16 @@ class dataTable():
 
   ##################
 
-  def mapAll(self,hh,hv):
+  def mapAll(self):
     '''Print a map of biomass to the screen'''
 
     # pack data
     print('Packing')
-    nX=hh.shape[0]
-    nY=hh.shape[1]
+    nX=self.palsarHH.data.shape[0]
+    nY=self.palsarHH.data.shape[1]
     data=np.empty((nX*nY,2),dtype=float)
-    data[:,0]=np.ndarray.flatten(hh)
-    data[:,1]=np.ndarray.flatten(hv)
+    data[:,0]=np.ndarray.flatten(self.palsarHH.data)
+    data[:,1]=np.ndarray.flatten(self.palsarHV.data)
 
     # predict
     print('Predicting')
@@ -305,7 +311,7 @@ class dataTable():
 
     # reshape back into image
     print('reshaping')
-    biomassMap=np.reshape(biomass,hh.shape)
+    biomassMap=np.reshape(biomass,self.palsarHH.data.shape)
 
     # plot it
     print('Plotting')
@@ -313,5 +319,51 @@ class dataTable():
     plt.show()
     print('Ping')
 
+    return
+
+  ##################
+
+  def plotError(self):
+    '''Plot error as a function of beam sensitivity and AGBD'''
+
+    # predict all
+    all_pred=self.regressor.predict(self.sar)
+
+    # plot against beam sensitivity
+    plt.plot(self.sensitivity*100,all_pred-self.agbd,'.')
+    plt.xlabel('Beam sensitivity (%)')
+    plt.ylabel('AGBD error (Mg/ha)')
+    plt.show()
+
+    # plot against AGBD
+    plt.plot(self.agbd,all_pred-self.agbd,'.')
+    plt.xlabel('GEDI L4A AGBD (Mg/ha)')
+    plt.ylabel('AGBD error (Mg/ha)')
+    plt.show()
+
+    return
+
+######################################################
+
+class palsar():
+  '''Class to hold and plot PALSAR data'''
+
+  ############################
+
+  def __init__(self,filename):
+    '''Class initialiser'''
+
+    self.file=rasterio.open(filename)
+    self.data=self.file.read(1)
+
+    return
+
+  ############################
+
+  def plotImage(self,graphTitle='PALSAR bacscatter'):
+    '''Plot an image of the raster layer'''
+    plt.imshow(self.data)
+    plt.title(graphTitle)
+    plt.show()
     return
 
