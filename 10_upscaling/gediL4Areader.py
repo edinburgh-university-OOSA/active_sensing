@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 import rasterio
+from glob import glob
 
 
 ######################################
@@ -27,10 +28,19 @@ class gediL4A():
   def __init__(self,filename):
     '''Class initialiser'''
 
+    # call file reading function
+    self.nWaves=0
+    self.readFile(filename)
+    print('Read',self.nWaves,'footprints')
+    return
+
+  ####################################
+
+  def readFile(self,filename):
+    '''Read a single GEDI L4A file'''
     # read the data
     f=h5py.File(filename,'r')
-    self.nWaves=0
-
+    
     # loop over beams
     beamList=['BEAM0000','BEAM0001','BEAM0010','BEAM0011','BEAM0101','BEAM0110','BEAM1000','BEAM1011']
     for b in beamList:
@@ -38,7 +48,7 @@ class gediL4A():
         continue                 # if not, skip it
       elif(('geolocation' in list(f[b]))==False):  # no data in bea,
         continue
-
+    
       # read data from file
       agbd=np.array(f[b]['agbd'])
       quality=np.array(f[b]['l4_quality_flag'])
@@ -62,7 +72,6 @@ class gediL4A():
 
       self.nWaves+=agbd.shape[0]
 
-    print('Found',self.nWaves,"footprints")
     self.f=f
     return
 
@@ -85,7 +94,7 @@ class gediL4A():
     self.lon=lon
     self.sensitivity=sensitivity
 
-    print('Filtered',self.nWaves-self.agbd.shape[0],'from',self.nWaves)
+    print('Filtered',self.nWaves-self.agbd.shape[0],'from',self.nWaves,", leaving",self.agbd.shape[0])
     self.nWaves=self.agbd.shape[0]
     return
 
@@ -144,12 +153,17 @@ class dataTable():
     # HH
     i=(gedi.lon-palsarHH.file.bounds[0])//palsarHH.file.res[0]
     j=(palsarHH.file.bounds[3]-gedi.lat)//palsarHH.file.res[0]
+    #j=(gedi.lat-palsarHH.file.bounds[1])//palsarHH.file.res[1]
+
 
     # filter data outside of image and save backscatter
-    iFilt=np.array(i[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)],dtype=int)
-    jFilt=np.array(j[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)],dtype=int)
+    iFilt=np.array(i[(i>=0)&(i<palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)],dtype=int)
+    jFilt=np.array(j[(i>=0)&(i<palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)],dtype=int)
+
+    # save SAR data into an array to pass to RF later
     self.sar=np.empty((jFilt.shape[0],2),dtype=float)
-    self.sar[:,0]=palsarHH.data[jFilt,iFilt]
+    self.sar[:,0]=palsarHH.data[jFilt,iFilt]  # HH
+    self.sar[:,1]=palsarHV.data[jFilt,iFilt]  # HV
 
     # save GEDI data
     self.agbd=gedi.agbd[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)]
@@ -157,15 +171,6 @@ class dataTable():
     self.lat=gedi.lat[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)]
     self.lon=gedi.lon[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)]
     self.sensitivity=gedi.sensitivity[(i>=0)&(i<=palsarHH.file.width)&(j>=0)&(j<palsarHH.file.height)]
-
-    # HV
-    i=(gedi.lon-palsarHV.file.bounds[0])//palsarHV.file.res[0]
-    j=(palsarHV.file.bounds[3]-gedi.lat)//palsarHV.file.res[0]
-    
-    # filter data outside of image and save backscatter
-    iFilt=np.array(i[(i>=0)&(i<=palsarHV.file.width)&(j>=0)&(j<palsarHV.file.height)],dtype=int)
-    jFilt=np.array(j[(i>=0)&(i<=palsarHV.file.width)&(j>=0)&(j<palsarHV.file.height)],dtype=int)
-    self.sar[:,1]=palsarHV.data[jFilt,iFilt]
 
     # save all palsar data for later
     self.palsarHH=palsarHH
@@ -342,6 +347,30 @@ class dataTable():
     plt.show()
 
     return
+
+
+######################################################
+
+class gediL4Amulti(gediL4A):
+  '''Class to read multiple GEDI L4A files and combine'''
+
+  ####################################
+
+  def __init__(self,dirName,fileRoot):
+    '''Class initialiser'''
+
+    # list all files in that directory
+    fileList=glob(dirName+'/'+fileRoot+"*.h5")
+
+    # loop over files and call file reading function
+    self.nWaves=0
+    for filename in fileList:
+      self.readFile(filename)
+      self.f.close()
+
+    print('Read',self.nWaves,'footprints')
+    return
+
 
 ######################################################
 
