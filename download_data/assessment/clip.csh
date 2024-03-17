@@ -1,12 +1,12 @@
 #!/bin/csh -f
 
-set inDir="/Users/dougal/data/teast/tellus/laz"
-set outDir="/Users/dougal/data/teast/tellus/clipped"
+set inDir="/Users/dougal/data/teaching/active_sensing/assessment/laz"
+set outDir="/Users/dougal/data/teaching/active_sensing/assessment/clipped"
 set list="/tmp/alsRaw.tellus_sw.txt"
 
 set minX=406000 
-set minY=5597000 
-set maxX=418000 
+set minY=560000
+set maxX=412000 
 set maxY=5605000
 
 
@@ -14,6 +14,7 @@ pushd $inDir/
 ls *laz|gawk '{for(i=1;i<=NF;i++)printf("%s/%s\n",dir,$i)}' dir=$inDir > $list
 popd
 
+if( ! -e $outDir )mkdir $outDir/
 
 @ nFiles=`wc -l < $list`
 @ i=1
