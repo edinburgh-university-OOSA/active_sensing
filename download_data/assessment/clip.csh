@@ -5,7 +5,7 @@ set outDir="/Users/dougal/data/teaching/active_sensing/assessment/clipped"
 set list="/tmp/alsRaw.tellus_sw.txt"
 
 set minX=406000 
-set minY=560000
+set minY=5600000
 set maxX=412000 
 set maxY=5605000
 
