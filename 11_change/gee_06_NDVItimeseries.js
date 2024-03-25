@@ -1,5 +1,8 @@
 // A script to extract a time series of Landsat-8 NDVI data
 
+// point of interest
+// var geometry: Point (-1.82, 55.52)
+
 // Import the Landsat 8 TOA image collection.
 var l8 = ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA');
 
