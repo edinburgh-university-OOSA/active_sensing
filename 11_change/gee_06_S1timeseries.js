@@ -9,6 +9,8 @@ var imgVH = ee.ImageCollection('COPERNICUS/S1_GRD')
         .filter(ee.Filter.eq('instrumentMode', 'IW'))
         .select('VH');
 
+// Need to clip the data before doing the filter step. Do it in space, with the GEE instructions.
+
 // separate ascending orbits
 var ascVH = imgVH.filter(ee.Filter.eq('orbitProperties_pass', 'ASCENDING'));
 
