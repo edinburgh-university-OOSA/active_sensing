@@ -32,7 +32,7 @@ var beforeVVdesc = descVV.filter(beforeDates).mean();
 var afterVVdesc = descVV.filter(afterDates).mean();
 
 // make the map
-Map.setCenter( -2.330734 ,57.025515, 13);
+Map.setCenter( -1.834475 ,55.524498, 13);
 Map.addLayer(beforeVHasc, {min: -25, max: 5}, 'VH ascending before', true);
 Map.addLayer(afterVHasc, {min: -25, max: 5}, 'VH ascending after', true);
 Map.addLayer(beforeVHdesc, {min: -25, max: 5}, 'VH descending before', true);

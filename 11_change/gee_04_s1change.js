@@ -18,7 +18,7 @@ var beforeVH = ascVH.filter(beforeDates).mean();
 var afterVH = ascVH.filter(afterDates).mean();
 
 // make the map
-Map.setCenter( -2.330734 ,57.025515, 13);
+Map.setCenter( -1.834475 ,55.524498, 13);
 Map.addLayer(beforeVH, {min: -25, max: 5}, 'Before', true);
 Map.addLayer(afterVH, {min: -25, max: 5}, 'After', true);
 
