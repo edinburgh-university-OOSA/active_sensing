@@ -1,4 +1,4 @@
-// A script to compare Sentinel-1 data at two time-steps
+// A script to extract a time series of Sentinel-1 data
 
 // Open the Sentinel-1 collection for VH
 var imgVH = ee.ImageCollection('COPERNICUS/S1_GRD')

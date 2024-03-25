@@ -1,4 +1,4 @@
-// A script to view a single Sentinel-1 scene
+// A script to view Sentinel-1 data in every possible combination at two time-steps
 
 // Open the Sentinel-1 collection for VH and VV
 var imgVH = ee.ImageCollection('COPERNICUS/S1_GRD')
