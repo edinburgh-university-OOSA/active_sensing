@@ -5,10 +5,10 @@
 var image = ee.Image('CGIAR/SRTM90_V4');
 
 // Zoom to a location.
-Map.setCenter( -2.552560 ,56.893688, 9); // Center on Aberdeenshire
+Map.setCenter( -3.9 ,56.8, 8); // Center on Scotland
 
 // Display the image on the map.
-Map.addLayer(image);
+Map.addLayer(image, {min: 0, max: 1345}, 'custom visualization');
 
 
 
