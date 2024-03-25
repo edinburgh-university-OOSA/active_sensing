@@ -4,9 +4,9 @@
 var image = ee.Image('CGIAR/SRTM90_V4');  // read SRTM
 
 var thresh=914;                           // threshold
-var dtm = image.select(['elevation']);    // read the elevation layer
-var subset1 = image.updateMask(dtm.gte(thresh)); // subset that is greater than or equal to thresh
-var subset2 = image.updateMask(dtm.lt(thresh));  // subset that is less than thresh
+var dem = image.select(['elevation']);    // read the elevation layer
+var subset1 = image.updateMask(dem.gte(thresh)); // subset that is greater than or equal to thresh
+var subset2 = image.updateMask(dem.lt(thresh));  // subset that is less than thresh
 
 // Zoom to a location.
 Map.setCenter( -3.9 ,56.8, 8); // Center on Scotland
