@@ -9,8 +9,10 @@ var imgVH = ee.ImageCollection('COPERNICUS/S1_GRD')
         .filter(ee.Filter.eq('instrumentMode', 'IW'))
         .select('VH');
 
+//var dates=ee.Filter.date('2017-01-01', '2022-06-01');  // filter out the noisy period of 1 satellite
+
 // clip to tiles over our point and separate ascending orbits
-var ascVH = imgVH.filterBounds(geometry).filter(ee.Filter.eq('orbitProperties_pass', 'ASCENDING'));
+var ascVH = imgVH.filterBounds(geometry).filter(ee.Filter.eq('orbitProperties_pass', 'ASCENDING')) //.filter(dates);
 
 // Create a chart.
 var chart = ui.Chart.image.series({

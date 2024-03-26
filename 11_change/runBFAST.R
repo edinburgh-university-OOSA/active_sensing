@@ -17,9 +17,11 @@ filename <- 'data/bfastInput.csv'
 s1data <- read.table(file=filename, sep=",", header=TRUE, fill=TRUE, check.names =FALSE)
 
 # run BFAST
-nBreaks=3
+nBreaks=1
 ts <-bfastts(s1data[,2],s1data[,1], type="irregular")
-fit <-bfastlite(ts, breaks=nBreaks)
+#fit <-bfast(ts, breaks=nBreaks)
+fit <-bfastlite(ts, breaks=nBreaks) #,stl = c("seasonal"))
+
 
 # print out the date
 for( n in 1:nBreaks){
