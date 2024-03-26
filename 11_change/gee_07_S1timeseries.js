@@ -1,7 +1,7 @@
 // A script to extract a time series of Landsat-8 NDVI data
 
 // point of interest
-var geometry = /* color: #d63000 */ee.Geometry.Point([-1.818780857185811, 55.51643550959151]);
+var geometry = /* color: #d63000 */ee.Geometry.Point([-1.8159373680132496,55.518401138401934]);
 
 // Open the Sentinel-1 collection for VH
 var imgVH = ee.ImageCollection('COPERNICUS/S1_GRD')
@@ -9,9 +9,7 @@ var imgVH = ee.ImageCollection('COPERNICUS/S1_GRD')
         .filter(ee.Filter.eq('instrumentMode', 'IW'))
         .select('VH');
 
-// Need to clip the data before doing the filter step. Do it in space, with the GEE instructions.
-
-// separate ascending orbits
+// clip to tiles over our point and separate ascending orbits
 var ascVH = imgVH.filterBounds(geometry).filter(ee.Filter.eq('orbitProperties_pass', 'ASCENDING'));
 
 
@@ -25,4 +23,7 @@ var chart = ui.Chart.image.series({
 
 // Display the chart in the console.
 print(chart);
+
+// export the timeseries
+
 
