@@ -1,6 +1,7 @@
 '''Convert date output by GEE to that expected by BFAST'''
 
 import numpy as np
+from math import exp
 
 
 ###############################################
@@ -38,13 +39,94 @@ def convertNameMonth(m):
 
 ###############################################
 
-def smooth(raw,width):
-  '''Smooth a function with a fixed window'''
+def setDoy(day,month,year):
 
-  x=np.arange(-10*width,10*width,1)
-  pulse=np.exp(-1*x**2/width**2)
-  y=np.convolve(raw,pulse)
-  return(y)
+  mLength=[31,28,31,30,31,30,31,31,30,31,30,31]
+
+  doy=0
+
+  # add up years
+  sYear=2014
+  for y in range(sYear,year):
+    # is it a leap year
+    if(((y-2000)%4)==0):
+      leap=1
+    else:
+      leap=0
+    doy+=365+leap
+
+  # add up months
+  if(((year-2000)%4)==0):
+    leap=1
+  else:
+    leap=0
+  for m in range(0,month-1):
+    doy+=mLength[m]
+    if(m==1):
+      doy+=leap
+
+  # add day
+  doy+=day
+
+  return(doy)
+
+
+###############################################
+
+def smooth(doy,y,width):
+  '''
+  Smooth a function with a fixed window
+  It is horrible in order to deal with gappy data
+  '''
+
+  smoothed=np.zeros(y.shape,dtype=float)
+  contN=np.zeros(y.shape,dtype=float)
+
+  for i in range(0,y.shape[0]):
+    # step backwards
+    for j in range(i,-1,-1):
+      dx=doy[i]-doy[j]
+      A=exp(-1*dx**2/width**2)
+      if(A<=0.0001):
+        break
+      smoothed[i]+=y[j]*A
+      contN[i]+=A
+    # step forwardcs
+    for j in range(i+1,y.shape[0],1):
+      dx=doy[i]-doy[j]
+      A=exp(-1*dx**2/width**2)
+      if(A<=0.0001):
+        break
+      smoothed[i]+=y[j]*A
+      contN[i]+=A
+
+  # normalise
+  smoothed=smoothed/contN
+
+  return(smoothed)
+
+
+###############################################
+
+def writeData(outName,day,month,year,vh):
+  '''Write output file'''
+
+  # write header
+  output=open(outName,'w')
+  line="Date,VH\n"
+  output.write(line)
+
+  for i in range(0,vh.shape[0]):
+    lineOut=str(year[i])+'-'+str(month[i])+'-'+str(day[i])+","+str(vh[i])+"\n"
+    output.write(lineOut)
+
+  # close files
+  output.close()
+  file.close()
+  print('Written to',outName)
+
+
+  return
 
 
 ###############################################
@@ -57,15 +139,13 @@ if(__name__=='__main__'):
 
   # read the VH backscatter and smooth
   vh=np.loadtxt(filename,usecols=(2),unpack=True,skiprows=1,delimiter=',')
-  smoothed=smooth(vh,4)
+  year=np.empty(vh.shape,dtype=int)
+  month=np.empty(vh.shape,dtype=int)
+  day=np.empty(vh.shape,dtype=int)
+  doy=np.empty(vh.shape,dtype=int)
 
   # open data
   file=open(filename, 'r')
-  output=open(outName,'w')
-
-  # write header
-  line="Date,VH\n"
-  output.write(line)
 
   # loop over lines
   inHead=True
@@ -80,17 +160,15 @@ if(__name__=='__main__'):
 
     # read parts of line
     m=line.split(',')[0].split(' ')[0].strip()
-    day=line.split(',')[0].split(' ')[1].strip()
-    year=line.split(',')[1].strip()
-
-    month=convertNameMonth(m)
-
-    lineOut=str(year)+'-'+str(month)+'-'+str(day)+","+str(smoothed[i])+"\n"
-    output.write(lineOut)
+    day[i]=int(line.split(',')[0].split(' ')[1].strip())
+    month[i]=convertNameMonth(m)
+    year[i]=int(line.split(',')[1].strip())
+    doy[i]=setDoy(day[i],month[i],year[i])
     i+=1
 
-  # close files
-  output.close()
-  file.close()
-  print('Written to',outName)
+  # smooth it
+  smoothed=smooth(doy,vh,width=7)
+
+  # write data
+  writeData(outName,day,month,year,smoothed)
 
