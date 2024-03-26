@@ -12,7 +12,6 @@ var imgVH = ee.ImageCollection('COPERNICUS/S1_GRD')
 // clip to tiles over our point and separate ascending orbits
 var ascVH = imgVH.filterBounds(geometry).filter(ee.Filter.eq('orbitProperties_pass', 'ASCENDING'));
 
-
 // Create a chart.
 var chart = ui.Chart.image.series({
   imageCollection: ascVH.select('VH'),
@@ -23,7 +22,4 @@ var chart = ui.Chart.image.series({
 
 // Display the chart in the console.
 print(chart);
-
-// export the timeseries
-
 
