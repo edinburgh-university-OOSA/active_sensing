@@ -3,85 +3,8 @@
 
 
 //Set AOI, t10tel covers both study areas A (G1) and B (G2)
-var AOI = angle2
+var AOI = ee.Geometry.Point([-1.8159373680132496,55.518401138401934]);
 
-// Adding a NDVI band
-function addNDVI(image) {
-  var ndvi = image.normalizedDifference(['B8', 'B4']).rename('ndvi');
-  return image.addBands([ndvi]);
-}
-
-// Adding a Moisture band for testing of most appropriate index of change
-function addNDWI(image) {
-  var ndwi = image.normalizedDifference(['B3', 'B5']).rename('ndwi');
-  return image.addBands([ndwi]);
-}
-
-// Cloud masking of Sentinel-2 L1C
-function maskS2clouds(image) {
-  var qa = image.select('QA60');
-  
-  // Bits 10 and 11 are clouds and cirrus, respectively. 
-  var cloudBitMask = 1 << 10;
-  var cirrusBitMask = 1 << 11; 
-  
-  // Both flags should be set to zero, indicating clear conditions. 
-  var mask = qa.bitwiseAnd(cloudBitMask).eq(0)
-      .and(qa.bitwiseAnd(cirrusBitMask).eq(0));
-  
-  return image.updateMask(mask);
-}
-
-
-// Creating the Sentinel-2 Image-Collection 
-var collection = ee.ImageCollection('COPERNICUS/S2')
-    .filterDate('2018-08-06','2018-08-08')
-    .map(maskS2clouds)
-    .map(addNDVI)
-    .map(addNDWI)
-//    .filter(ee.Filter.eq('CLOUDY_PIXEL_PERCENTAGE', 0))
-    .filter(ee.Filter.bounds(AOI)); // CHNAGE BACK TO TABLE 
-    
-// View the median composite
-var vizParams = {bands: ['B4', 'B3', 'B2'], min: 0, max: 2000};
-Map.addLayer(collection.median(), vizParams, 'collection');
-
-var getImage = function(id) {
-  return ee.Image(collection.filter(ee.Filter.eq('system:index', id)).first())
-}
-
-//Sentinel-2 image collection to extract points for each pixel 
-var collectionX = ee.ImageCollection('COPERNICUS/S2')
-    .filterDate('2017-06-01','2021-05-30')
-    .map(addNDVI)
-    .map(addNDWI)
-    .filter(ee.Filter.bounds(AOI));  
-    
-//Make a point in the center of a 5x5 sentinel pixel window 
-var sentinelpixels = ee.Image(collectionX.first()).clip(AOI);
-var img = sentinelpixels.addBands(ee.Image.pixelLonLat())
-
-var samples = img.sample({
-  region: AOI,
-  scale: 50,
-  numPixels: 1204899790,
-  dropNulls:false,
-  geometries: true 
-})
-
-//coarsen the pixels by prodcuing bounding boxes around the previously extracted points 
-var bounding_box_func = function(feature) {
-    var intermediate_buffer = feature.buffer(25);  // buffer radius to produce 5x5 pixel-window 
-    var intermediate_box = intermediate_buffer.bounds(); // Draw a bounding box around the central pixel point 
-      return(intermediate_box); // Return the bounding box
-      };
-
-// Apply function
- var bounding_boxes = samples.map(bounding_box_func);
-    Map.centerObject(samples); // Center map on sample points
-    Map.addLayer(bounding_boxes, {color: '#FECA1E'}, "Bounding boxes");
-
-// print(bounding_boxes.size());
 
 //Subset the Study Areas into 5000 pixel windows 
  var chunk = 5000
