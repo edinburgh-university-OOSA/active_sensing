@@ -2,6 +2,21 @@
 
 import numpy as np
 from math import exp
+import argparse
+
+
+###############################################
+
+def readCommands():
+  '''
+  Get commandline arguments
+  '''
+  # create an argparse object with a useful help comment
+  p = argparse.ArgumentParser(description=("An illustration of a command line parser"))
+  # read a string
+  p.add_argument("--median",dest="median", action='store_true', default=False, help=("Use median filter"))
+  cmdargs = p.parse_args()
+  return cmdargs
 
 
 ###############################################
@@ -73,7 +88,21 @@ def setDoy(day,month,year):
 
 ###############################################
 
-def smooth(doy,y,width):
+def smoothMedian(doy,vh,width=15):
+  '''
+  Smooth by a median filter
+  It can deal with gappy data
+  '''
+
+  smoothed=np.zeros(y.shape,dtype=float)
+
+
+  return(smoothed)
+
+
+###############################################
+
+def smoothGuass(doy,y,width):
   '''
   Smooth a function with a fixed window
   It is horrible in order to deal with gappy data
@@ -137,6 +166,9 @@ if(__name__=='__main__'):
   outName='bfastInput.csv'
   filename='ee-chart.csv'
 
+  # read the command line
+  cmd=readCommands()
+
   # read the VH backscatter and smooth
   vh=np.loadtxt(filename,usecols=(2),unpack=True,skiprows=1,delimiter=',')
   year=np.empty(vh.shape,dtype=int)
@@ -167,7 +199,10 @@ if(__name__=='__main__'):
     i+=1
 
   # smooth it
-  smoothed=smooth(doy,vh,width=7)
+  if(cmd.median):
+    smoothed=smoothMedian(doy,vh,width=15)
+  else:
+    smoothed=smoothGauss(doy,vh,width=7)
 
   # write data
   writeData(outName,day,month,year,smoothed)
