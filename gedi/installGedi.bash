@@ -47,7 +47,7 @@ if [ ! -e $HOMDIR/bin/csh ];then
 fi
 
 pushd $HOMDIR/src
-wget https://www.physics.wisc.edu/~craigm/idl/down/cmpfit-1.2.tar.gz
+cp /geos/netdata/active_sensing/cmpfit-1.2.tar.gz $HOMDIR/src/
 tar -xvf cmpfit-1.2.tar.gz
 popd
 
