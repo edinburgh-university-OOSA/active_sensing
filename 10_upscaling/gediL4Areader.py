@@ -180,6 +180,16 @@ class dataTable():
 
   ####################################
 
+  def updatePalsar(self,palsarHH,palsarHV):
+    '''Change the PALSAR files, eg to load small subsets'''
+    
+    self.palsarHH=palsarHH
+    self.palsarHV=palsarHV
+
+    return
+
+  ####################################
+
   def plotHH(self):
     '''Plot the HH dataset'''
 
