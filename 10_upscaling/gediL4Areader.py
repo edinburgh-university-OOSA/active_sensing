@@ -326,14 +326,29 @@ class dataTable():
 
     # reshape back into image
     print('reshaping')
-    biomassMap=np.reshape(biomass,self.palsarHH.data.shape)
+    self.biomassMap=np.reshape(biomass,self.palsarHH.data.shape)
 
     # plot it
     print('Plotting')
-    plt.imshow(biomassMap)
+    plt.imshow(self.biomassMap)
     plt.show()
     print('Ping')
 
+    return
+
+  ##################
+
+  def writeMap(self,filename):
+    '''Write the biomass map to a file'''
+    
+    new_dataset=rasterio.open(filename,'w',driver='GTiff',height=self.palsarHH.file.height,\
+                              width=self.palsarHH.file.width,count=1,dtype=self.biomassMap.dtype,\
+                              crs=self.palsarHH.file.crs,transform=self.palsarHH.file.transform)
+    new_dataset.write(self.biomassMap, 1)
+    new_dataset.nodata = -999.0
+    new_dataset.close()
+
+    print('Map drawn to',filename)
     return
 
   ##################
