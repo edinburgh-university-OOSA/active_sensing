@@ -255,11 +255,11 @@ class dataTable():
 
   ##################
 
-  def buildRF(self,n_estimators,max_depth):
+  def buildRF(self,n_estimators,max_depth,min_samples_split=2):
     '''Build a random forest model'''
 
     # initlise the class
-    self.regressor=RandomForestRegressor(n_estimators=n_estimators,max_depth=max_depth,random_state=0)  # initialise the class
+    self.regressor=RandomForestRegressor(n_estimators=n_estimators,max_depth=max_depth,random_state=0,min_samples_split=min_samples_split)  # initialise the class
 
     # fit the model to the training data
     self.regressor.fit(self.x_train,self.y_train)
