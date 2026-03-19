@@ -88,7 +88,7 @@ def setDoy(day,month,year):
 
 ###############################################
 
-def smoothMedian(doy,vh,width=15):
+def smoothMedian(doy,y,width=15):
   '''
   Smooth by a median filter
   It can deal with gappy data
