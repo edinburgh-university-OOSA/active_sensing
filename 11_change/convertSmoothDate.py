@@ -102,7 +102,7 @@ def smoothMedian(doy,vh,width=15):
 
 ###############################################
 
-def smoothGuass(doy,y,width):
+def smoothGauss(doy,y,width):
   '''
   Smooth a function with a fixed window
   It is horrible in order to deal with gappy data
